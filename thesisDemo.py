@@ -6,7 +6,10 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
 import customtkinter
+from customtkinter import CTkImage
 import soundfile as sf
 import noisereduce as nr
 from keras.models import load_model # type: ignore
@@ -53,7 +56,7 @@ class App(customtkinter.CTk):
         self.label.pack(padx=20, pady=(0, 0))
 
         self.label = customtkinter.CTkLabel(self,
-                                      text="Erquiza, Mamaclay, Platon (2023)",
+                                      text="Erquiza, Mamaclay, Platon, Acula (2023)",
                                       fg_color="transparent",
                                       font=("Helvetica", 14, "italic"))  # Adjust font family, size, and weight here
         self.label.pack(padx=20, pady=(0, 0))
@@ -156,7 +159,7 @@ class App(customtkinter.CTk):
         self.button_display_mfcc.pack(side="left", pady=10, padx=10)
 
         # Add the toggle switch for appearance mode
-        self.appearance_mode_switch = customtkinter.CTkSwitch(self, text="Dark Mode", command=self.toggle_appearance_mode)
+        self.appearance_mode_switch = customtkinter.CTkSwitch(self, text="Light Mode", command=self.toggle_appearance_mode)
         self.appearance_mode_switch.place(relx=1.0, rely=1.0, anchor="se", x=-30, y=-30)
 
         # Set the initial state of the switch
@@ -187,7 +190,9 @@ class App(customtkinter.CTk):
 
         # Remove MFCC image if it exists
         if hasattr(self, 'mfcc_image_label'):
-            self.mfcc_image_label.configure(image='')
+            # Explicitly clear the image by setting it to None
+            self.mfcc_image_label.configure(image=None)
+            self.mfcc_image_label.image = None
 
         # Reset the progress bar
         self.progress_bar.set(0)
@@ -200,12 +205,15 @@ class App(customtkinter.CTk):
     def display_mfcc_image(self, image_path):
         # Load the image using PIL
         img = Image.open(image_path)
-        img = img.resize((250, 75))  # Resize for display, adjust as needed
-        img_tk = ImageTk.PhotoImage(img)
+        width = 250
+        height = 75
+        img = img.resize((width, height))  # Resize for display, adjust as needed
 
-        # Update the label
-        self.mfcc_image_label.configure(image=img_tk)
-        self.mfcc_image_label.image = img_tk  # Keep a reference to avoid garbage collection
+        img_ctk = CTkImage(light_image=img, dark_image=img, size=(width, height))  
+
+        # Update the label with the CTkImage
+        self.mfcc_image_label.configure(image=img_ctk)
+        self.mfcc_image_label.image = img_ctk 
 
     def button_display_mfcc_callback(self):
         if not hasattr(self, 'uploaded_file_path'):
@@ -223,9 +231,13 @@ class App(customtkinter.CTk):
         if self.appearance_mode_switch.get() == 1:  # If switch is on
             customtkinter.set_appearance_mode("dark")
             self.textbox.configure(text_color="white")
+            self.appearance_mode_switch.configure(text="Light Mode")
+
         else:  # If switch is off
             customtkinter.set_appearance_mode("light")
             self.textbox.configure(text_color="black")
+            self.appearance_mode_switch.configure(text="Dark Mode")
+
 
     def upload_audio_file(self):
         # Display a loading message
