@@ -314,7 +314,7 @@ class App(customtkinter.CTk):
         if not model_path:
             raise ValueError(f"Model {model_name} not found.")
 
-        model = load_model(model_path)
+        model = load_model(model_path, compile=False)
         img = Image.open(img_path).convert('RGB')
         img = img.resize((1000, 400))
         img_array = np.array(img) / 255.0
