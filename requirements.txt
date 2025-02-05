@@ -1,0 +1,9 @@
+tensorflow
+librosa
+matplotlib
+customtkinter
+soundfile
+noisereduce
+keras
+numpy
+Pillow
