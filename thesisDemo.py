@@ -2,6 +2,11 @@ import tkinter
 import tkinter.messagebox
 import tkinter as tk
 import tkinter.filedialog as filedialog
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  
+import tensorflow as tf
+from keras.models import load_model # type: ignore
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
@@ -9,14 +14,10 @@ import customtkinter
 from customtkinter import CTkImage
 import soundfile as sf
 import noisereduce as nr
-from keras.models import load_model # type: ignore
 import numpy as np 
 from PIL import Image, ImageTk
 import io
 import matplotlib.pyplot as plt
-import os
-os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
 
 # Set up directories
 MFCC_SAVE_DIRECTORY = "mfcc_images"
@@ -27,21 +28,14 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 
 # Callback function
 # Pre-defined paths to your saved models
-MODEL_PATHS = {
-    "VGGNet16": os.path.join(MODEL_DIRECTORY, "VGGNet16.h5"),
-    "ResNet50": os.path.join(MODEL_DIRECTORY, "ResNet50.h5"),
-    "InceptionV3": os.path.join(MODEL_DIRECTORY, "InceptionV3.h5"),
-    "Hybrid VGGNet16": os.path.join(MODEL_DIRECTORY, "Hybrid_VGGNet16.h5"),
-    "Hybrid ResNet50": os.path.join(MODEL_DIRECTORY, "Hybrid_ResNet50.h5"),
-    "Hybrid InceptionV3": os.path.join(MODEL_DIRECTORY, "Hybrid_InceptionV3.h5")
-}
+MODEL_PATH = os.path.join(MODEL_DIRECTORY, "VGGNet16.h5")
 
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("Mental State Recognition through Speech Analysis")
-        self.geometry(f"{1300}x{800}")
+        self.geometry(f"{1000}x{700}")
 
         self.label = customtkinter.CTkLabel(self,
                                        text="Mental State Recognition through Speech Analysis Using\nBidirectional Long Short-Term Memory Network and Convolutional Neural Network Hybrid Model",
@@ -65,20 +59,16 @@ class App(customtkinter.CTk):
         self.frame_1.pack(pady=(20,70), padx=30, fill="both", expand=True)
 
         self.label = customtkinter.CTkLabel(self.frame_1,
-                                       text="Select Model Architecture:",
+                                       text="Upload your Audio File for Depression Level Prediction:",
                                        fg_color="transparent",
-                                       font=("Helvetica", 14))  # Adjust font family, size, and weight here
-        self.label.pack(padx=20, pady=(30, 0))
-
-        self.combobox = customtkinter.CTkOptionMenu(self.frame_1, values=["VGGNet16", "ResNet50", "InceptionV3", "Hybrid VGGNet16", "Hybrid ResNet50", "Hybrid InceptionV3"], width=500, fg_color="gray")
-        self.combobox.pack(pady=10, padx=0)
-        self.combobox.set("Choose your preferred model")
+                                       font=("Helvetica", 14))
+        self.label.pack(padx=20, pady=(10, 0))
 
         # Add a progress bar
         self.progress_bar = customtkinter.CTkProgressBar(self.frame_1)
         self.progress_bar.pack(pady=(10, 0), padx=20)
         self.progress_bar.set(0)
-        # progress_bar.grid_remove()  # Initially hide the progress bar
+        # self.progress_bar.grid_remove()  # Initially hide the progress bar
 
         self.label_filename = customtkinter.CTkLabel(self.frame_1, text="No file selected", fg_color="transparent")
         self.label_filename.pack(padx=20, pady=(10,0))
@@ -275,12 +265,12 @@ class App(customtkinter.CTk):
 
         return y_reduced_noise, sr
 
-    def load_model_for_prediction(self, model_name):
-        model_path = MODEL_PATHS.get(model_name)
+    def load_model_for_prediction(self, MODEL_PATH):
+        model_path = MODEL_PATH
         if model_path:
             return load_model(model_path)
         else:
-            raise ValueError(f"Model {model_name} not found.")
+            raise ValueError(f"Model not found.")
 
     def save_mfcc_image(self, file_path, n_mfcc=13):
         """Compute MFCC for a given audio file and save it as an image."""
@@ -305,12 +295,8 @@ class App(customtkinter.CTk):
 
         return save_path
 
-    def predict_with_model(self, img_path, model_name):
-        model_path = MODEL_PATHS.get(model_name)
-        if not model_path:
-            raise ValueError(f"Model {model_name} not found.")
-
-        model = load_model(model_path, compile=False)
+    def predict_with_model(self, img_path, MODEL_PATH):
+        model = load_model(MODEL_PATH, compile=False)
         img = Image.open(img_path).convert('RGB')
         img = img.resize((1000, 400))
         img_array = np.array(img) / 255.0
@@ -325,7 +311,6 @@ class App(customtkinter.CTk):
         return f"Predicted Class: {predicted_level}"
 
     def button_predict_callback(self):
-        selected_model = self.combobox.get()
         if not hasattr(self, 'uploaded_file_path'):
             tk.messagebox.showerror("Error", "No audio file selected")
             return
@@ -334,7 +319,7 @@ class App(customtkinter.CTk):
         mfcc_image_path = self.save_mfcc_image(self.uploaded_file_path)
 
         # Predict with the selected model
-        prediction = self.predict_with_model(mfcc_image_path, selected_model)
+        prediction = self.predict_with_model(mfcc_image_path, MODEL_PATH)
 
         # Get the level description
         level_description = self.level_descriptions.get(prediction, "Unknown level description")
