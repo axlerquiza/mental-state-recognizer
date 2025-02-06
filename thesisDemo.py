@@ -5,18 +5,17 @@ import tkinter.filedialog as filedialog
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
+import customtkinter
+from customtkinter import CTkImage
+import noisereduce as nr
+import numpy as np 
+from PIL import Image
+import io
+import matplotlib.pyplot as plt
+from keras.models import load_model # type: ignore
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Disable oneDNN optimizations
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow logs
-import customtkinter
-from customtkinter import CTkImage
-import soundfile as sf
-import noisereduce as nr
-from keras.models import load_model # type: ignore
-import numpy as np 
-from PIL import Image, ImageTk
-import io
-import matplotlib.pyplot as plt
 
 # Set up directories
 MFCC_SAVE_DIRECTORY = "mfcc_images"
@@ -201,7 +200,6 @@ class App(customtkinter.CTk):
         if hasattr(self, 'uploaded_file_path'):
             del self.uploaded_file_path
     
-    
     def display_mfcc_image(self, image_path):
         # Load the image using PIL
         img = Image.open(image_path)
@@ -225,8 +223,7 @@ class App(customtkinter.CTk):
 
         # Display the MFCC image
         self.display_mfcc_image(mfcc_image_path)
-    
-    
+     
     def toggle_appearance_mode(self):
         if self.appearance_mode_switch.get() == 1:  # If switch is on
             customtkinter.set_appearance_mode("dark")
@@ -237,7 +234,6 @@ class App(customtkinter.CTk):
             customtkinter.set_appearance_mode("light")
             self.textbox.configure(text_color="black")
             self.appearance_mode_switch.configure(text="Dark Mode")
-
 
     def upload_audio_file(self):
         # Display a loading message
@@ -278,7 +274,6 @@ class App(customtkinter.CTk):
 
         return y_reduced_noise, sr
 
-    # Function to load and return a model
     def load_model_for_prediction(self, model_name):
         model_path = MODEL_PATHS.get(model_name)
         if model_path:
