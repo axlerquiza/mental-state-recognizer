@@ -2,32 +2,35 @@ import tkinter
 import tkinter.messagebox
 import tkinter as tk
 import tkinter.filedialog as filedialog
+
+import customtkinter
+from customtkinter import CTkImage
+
 import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  
+import io
+
 import tensorflow as tf
 from keras.models import load_model # type: ignore
+import numpy as np 
 import librosa
 import librosa.display
-import matplotlib.pyplot as plt
-import customtkinter
-from customtkinter import CTkImage
+
 import soundfile as sf
 import noisereduce as nr
-import numpy as np 
 from PIL import Image, ImageTk
-import io
 import matplotlib.pyplot as plt
+
+# GUI themes
+customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
+customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 # Set up directories
 MFCC_SAVE_DIRECTORY = "mfcc_images"
 MODEL_DIRECTORY = "models"
 
-customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
-
-# Callback function
-# Pre-defined paths to your saved models
+# Model used
 MODEL_PATH = os.path.join(MODEL_DIRECTORY, "VGGNet16.h5")
 
 class App(customtkinter.CTk):
@@ -157,6 +160,17 @@ class App(customtkinter.CTk):
         self.appearance_mode_switch.select()
         customtkinter.set_appearance_mode("dark")  # Set the appearance mode to dark initially
 
+    def toggle_appearance_mode(self):
+        if self.appearance_mode_switch.get() == 1:  # If switch is on
+            customtkinter.set_appearance_mode("dark")
+            self.textbox.configure(text_color="white")
+            self.appearance_mode_switch.configure(text="Light Mode")
+
+        else:  # If switch is off
+            customtkinter.set_appearance_mode("light")
+            self.textbox.configure(text_color="black")
+            self.appearance_mode_switch.configure(text="Dark Mode")
+
     def reset_app(self):
         # Clear the textbox
         self.textbox.configure(state="normal")
@@ -175,9 +189,6 @@ class App(customtkinter.CTk):
         # Reset the label filename
         self.label_filename.configure(text="No file selected")
 
-        # Reset the combobox to initial state
-        self.combobox.set("Choose your preferred model")
-
         # Remove MFCC image if it exists
         if hasattr(self, 'mfcc_image_label'):
             # Explicitly clear the image by setting it to None
@@ -191,41 +202,6 @@ class App(customtkinter.CTk):
         if hasattr(self, 'uploaded_file_path'):
             del self.uploaded_file_path
      
-    def display_mfcc_image(self, image_path):
-        # Load the image using PIL
-        img = Image.open(image_path)
-        width = 250
-        height = 75
-        img = img.resize((width, height))  # Resize for display, adjust as needed
-
-        img_ctk = CTkImage(light_image=img, dark_image=img, size=(width, height))  
-
-        # Update the label with the CTkImage
-        self.mfcc_image_label.configure(image=img_ctk)
-        self.mfcc_image_label.image = img_ctk 
-
-    def button_display_mfcc_callback(self):
-        if not hasattr(self, 'uploaded_file_path'):
-            tk.messagebox.showerror("Error", "No audio file selected")
-            return
-
-        # Generate MFCC and get the image path
-        mfcc_image_path = self.save_mfcc_image(self.uploaded_file_path)
-
-        # Display the MFCC image
-        self.display_mfcc_image(mfcc_image_path)
-    
-    def toggle_appearance_mode(self):
-        if self.appearance_mode_switch.get() == 1:  # If switch is on
-            customtkinter.set_appearance_mode("dark")
-            self.textbox.configure(text_color="white")
-            self.appearance_mode_switch.configure(text="Light Mode")
-
-        else:  # If switch is off
-            customtkinter.set_appearance_mode("light")
-            self.textbox.configure(text_color="black")
-            self.appearance_mode_switch.configure(text="Dark Mode")
-
     def upload_audio_file(self):
         # Display a loading message
         # Show the progress bar
@@ -248,29 +224,6 @@ class App(customtkinter.CTk):
             self.label_filename.configure(text="No file selected")
 
             self.progress_bar.start()
-
-    def preprocess_audio(self,file_path, target_duration=10.0):
-        # Load the audio file
-        y, sr = librosa.load(file_path, sr=None)
-
-        # Crop the audio file to the target duration
-        if librosa.get_duration(y=y, sr=sr) > target_duration:
-            y = y[:int(sr * target_duration)]
-
-        # Apply noise reduction
-        y_reduced_noise = nr.reduce_noise(y=y, sr=sr)
-
-        # Apply noise reduction
-        y_reduced_noise = nr.reduce_noise(y=y, sr=sr)
-
-        return y_reduced_noise, sr
-
-    def load_model_for_prediction(self, MODEL_PATH):
-        model_path = MODEL_PATH
-        if model_path:
-            return load_model(model_path)
-        else:
-            raise ValueError(f"Model not found.")
 
     def save_mfcc_image(self, file_path, n_mfcc=13):
         """Compute MFCC for a given audio file and save it as an image."""
@@ -295,6 +248,30 @@ class App(customtkinter.CTk):
 
         return save_path
 
+    def display_mfcc_image(self, image_path):
+        # Load the image using PIL
+        img = Image.open(image_path)
+        width = 250
+        height = 75
+        img = img.resize((width, height))  # Resize for display, adjust as needed
+
+        img_ctk = CTkImage(light_image=img, dark_image=img, size=(width, height))  
+
+        # Update the label with the CTkImage
+        self.mfcc_image_label.configure(image=img_ctk)
+        self.mfcc_image_label.image = img_ctk 
+
+    def button_display_mfcc_callback(self):
+        if not hasattr(self, 'uploaded_file_path'):
+            tk.messagebox.showerror("Error", "No audio file selected")
+            return
+
+        # Generate MFCC and get the image path
+        mfcc_image_path = self.save_mfcc_image(self.uploaded_file_path)
+
+        # Display the MFCC image
+        self.display_mfcc_image(mfcc_image_path)
+    
     def predict_with_model(self, img_path, MODEL_PATH):
         model = load_model(MODEL_PATH, compile=False)
         img = Image.open(img_path).convert('RGB')
