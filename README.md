@@ -1,7 +1,7 @@
 
 # Mental State Recognizer (GUI Version)
 
-This project predicts a person's mental state based on their speech using a deep learning model. It utilizes a hybrid model combining **BiLSTM** and **CNN** to analyze features extracted from audio files.
+This project predicts a person's mental state based on their speech using a deep learning model. It utilizes a hybrid model combining **BiLSTM** and **CNN** to analyze features extracted from audio files. You can read more about the published paper [here](https://ieeexplore.ieee.org/document/10690712).
 
 ## Technologies Used
 
