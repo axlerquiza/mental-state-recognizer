@@ -23,7 +23,7 @@ This project predicts a person's mental state based on their speech using a deep
 2. **Set up a virtual environment** (optional but recommended):
    ```bash
    python -m venv venv
-   source venv/bin/activate  # For Windows, use `venv\Scriptsctivate`
+   source venv/bin/activate  # For Windows, use `venv\Scripts\activate`
    ```
 
 3. **Install the required dependencies**:
