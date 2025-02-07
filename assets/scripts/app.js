@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const predictBtn = document.getElementById("predict");
     const mfccImage = document.getElementById("mfccImage");
     const assistantFrame = document.getElementById("assistant");
+    const resetBtn = document.getElementById("reset");
 
     let selectedFile = null;
     let mfccImageUrl = "";
@@ -78,5 +79,19 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error:", error);
             alert("Failed to connect to server.");
         });
+    });
+
+    // Handle Reset
+    resetBtn.addEventListener("click", function () {
+        fileInput.value = "";
+        selectedFile = null;
+        fileNameDisplay.textContent = "No file selected";
+    
+        mfccImage.src = "";
+        mfccImage.style.display = "none";
+        mfccImageUrl = "";
+    
+        const iframeDoc = assistantFrame.contentDocument || assistantFrame.contentWindow.document;
+        iframeDoc.body.innerHTML = "<p></p>";
     });
 });

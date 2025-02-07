@@ -4,7 +4,7 @@ import os
 import librosa
 import numpy as np
 import matplotlib.pyplot as plt
-from keras.models import load_model
+from keras.models import load_model # type: ignore
 from PIL import Image
 import uuid
 
