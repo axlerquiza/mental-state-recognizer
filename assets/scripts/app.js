@@ -95,3 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
         predictDisplay.textContent = "";
     });
 });
+
+document.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', function() {
+        this.blur();
+    });
+});

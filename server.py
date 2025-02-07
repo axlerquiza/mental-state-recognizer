@@ -36,7 +36,7 @@ def get_mfcc_image(filename):
     return send_from_directory(MFCC_FOLDER, filename)
 
 # Function to generate MFCC
-def save_mfcc_image(file_path, n_mfcc=13):
+def save_mfcc_image(file_path, filename, n_mfcc=13):
     y, sr = librosa.load(file_path)
     mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=n_mfcc)
 
@@ -44,12 +44,13 @@ def save_mfcc_image(file_path, n_mfcc=13):
     librosa.display.specshow(mfccs, sr=sr)
     plt.axis("off")
 
-    save_filename = f"{uuid.uuid4().hex}.png"
+    # Use the same name as the audio file, but save as .png
+    save_filename = f"{filename}.png"
     save_path = os.path.join(MFCC_FOLDER, save_filename)
 
     plt.savefig(save_path, bbox_inches="tight", pad_inches=0)
     plt.close()
-    
+
     return save_filename
 
 # Function to predict mental state
@@ -97,7 +98,6 @@ def predict_mfcc(image_path):
 
     return level_mapping.get(predicted_class, {"label": "Unknown", "description": "No data available."})
 
-
 # Route to handle file uploads and generate MFCC
 @app.route("/generate_mfcc", methods=["POST"])
 def generate_mfcc():
@@ -105,13 +105,18 @@ def generate_mfcc():
         return jsonify({"success": False, "error": "No file uploaded"}), 400
 
     audio_file = request.files["audioFile"]
-    filename = f"{uuid.uuid4().hex}.wav"
-    file_path = os.path.join(UPLOAD_FOLDER, filename)
+    original_filename = os.path.splitext(audio_file.filename)[0]  # Extract filename without extension
+    filename = f"{original_filename}.wav"  # Save as .wav
 
+    file_path = os.path.join(UPLOAD_FOLDER, filename)
     audio_file.save(file_path)
 
-    # Generate MFCC and return image URL
-    mfcc_filename = save_mfcc_image(file_path)
+    # Generate MFCC
+    mfcc_filename = save_mfcc_image(file_path, original_filename)
+
+    # Delete the uploaded file after processing
+    os.remove(file_path)
+
     return jsonify({"success": True, "mfccImageUrl": f"/mfcc_images/{mfcc_filename}"})
 
 # Route to predict from MFCC

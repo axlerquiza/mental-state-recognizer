@@ -33,6 +33,18 @@ p {
     text-align: justify;
 }
 
+a,
+a:visited {
+    color: var(--main-color);
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+a:hover,
+a:focus {
+    color: var(--text-color);
+}
+
 #app {
     margin-top: 40px;
     background-color: var(--bg-color);
@@ -80,6 +92,7 @@ input[type="file"] {
     outline: none;
     line-height: 20px;
     justify-self: end;
+    transition: color 0.3s ease;
 }
 
 .button:hover,
@@ -97,4 +110,27 @@ input[type="file"] {
 #reset {
     background-color: var(--main-color);
     color: var(--bg-color);
+}
+
+::selection {
+    background-color: var(--main-color);
+    color: var(--bg-color);
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--main-color);
+}
+
+@media (max-width: 768px) {
+    .bax {
+        max-width: 70%;
+    }
 }
