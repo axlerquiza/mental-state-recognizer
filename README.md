@@ -1,7 +1,9 @@
 
-# Mental State Recognizer (GUI Version)
+# Mental State Recognizer (`gui-legacy` Version)
 
 This project predicts a person's mental state based on their speech using a deep learning model. It utilizes a hybrid model combining **BiLSTM** and **CNN** to analyze features extracted from audio files. You can read more about the published paper [here](https://ieeexplore.ieee.org/document/10690712).
+
+**_Note: The `gui-legacy` branch is an older version of the GUI and might encounter bugs._**
 
 ## Technologies Used
 
@@ -21,9 +23,9 @@ This project predicts a person's mental state based on their speech using a deep
    cd mental-state-recognizer
    ```
 
-1. **Switch to the `gui` branch**:
+1. **Switch to the `gui-legacy` branch**:
    ```bash
-    git switch gui
+    git switch gui-legacy
    ```
 
 3. **Set up a virtual environment** (optional but recommended):
