@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const generateMFCCBtn = document.getElementById("generateMFCC");
     const predictBtn = document.getElementById("predict");
     const mfccImage = document.getElementById("mfccImage");
-    const assistantFrame = document.getElementById("assistant");
+    const predictDisplay = document.getElementById("predictOutput");
     const resetBtn = document.getElementById("reset");
 
     let selectedFile = null;
@@ -37,20 +37,20 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             body: formData,
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                mfccImageUrl = `${BACKEND_URL}${data.mfccImageUrl}`;
-                mfccImage.src = mfccImageUrl;
-                mfccImage.style.display = "block";
-            } else {
-                alert("Error generating MFCC image.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Failed to connect to server.");
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mfccImageUrl = `${BACKEND_URL}${data.mfccImageUrl}`;
+                    mfccImage.src = mfccImageUrl;
+                    mfccImage.style.display = "block";
+                } else {
+                    alert("Error generating MFCC image.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to connect to server.");
+            });
     });
 
     // Handle Prediction
@@ -67,18 +67,18 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Content-Type": "application/json"
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                assistantFrame.contentDocument.body.innerHTML = `<p>${data.prediction}</p>`;
-            } else {
-                alert("Error making prediction.");
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            alert("Failed to connect to server.");
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    predictDisplay.textContent = data.prediction;
+                } else {
+                    alert("Error making prediction.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Failed to connect to server.");
+            });
     });
 
     // Handle Reset
@@ -86,12 +86,11 @@ document.addEventListener("DOMContentLoaded", function () {
         fileInput.value = "";
         selectedFile = null;
         fileNameDisplay.textContent = "No file selected";
-    
+
         mfccImage.src = "";
         mfccImage.style.display = "none";
         mfccImageUrl = "";
-    
-        const iframeDoc = assistantFrame.contentDocument || assistantFrame.contentWindow.document;
-        iframeDoc.body.innerHTML = "<p></p>";
+
+        predictDisplay.textContent = "";
     });
 });

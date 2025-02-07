@@ -22,10 +22,10 @@
         </div>
         <input type="file" id="audioUpload" accept=".mp3, .wav, .aac">
         <span id="fileName">No file selected</span>
-        
+
         <div class="grid-container">
-        <h4>MFCC Image</h4>
-        <label id="generateMFCC" class="button">Generate MFCC</label>
+            <h4>MFCC Image</h4>
+            <label id="generateMFCC" class="button">Generate MFCC</label>
         </div>
         <div id="mfccDisplay">
             <img id="mfccImage" src="" alt="MFCC will appear here" style="display: none; max-width: 100%;">
@@ -33,10 +33,12 @@
         <br>
         <label id="predict" class="button">Predict</label>
         <div class="grid-container">
-        <h4>Output</h4>
-        <label id="reset" class="button">Reset</label>
+            <h4>Output</h4>
+            <label id="reset" class="button">Reset</label>
         </div>
-        <iframe id="assistant" name="response"></iframe>
+        <div id="predictDisplay">
+            <span id="predictOutput"></span>
+        </div>
     </div>
 
     <script src="assets/scripts/app.js"></script>

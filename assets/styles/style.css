@@ -5,7 +5,7 @@
 
 html {
     margin: 0 auto;
-    font-family: verdana;
+    font-family: 'Roboto Mono', monospace;
     width: 600px;
     background-color: var(--bg-color);
     background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%2354585c' fill-opacity='0.43' fill-rule='evenodd'/%3E%3C/svg%3E");
@@ -29,6 +29,10 @@ h4 {
     font-size: 1em;
 }
 
+p {
+    text-align: justify;
+}
+
 #app {
     margin-top: 40px;
     background-color: var(--bg-color);
@@ -37,14 +41,18 @@ h4 {
     border-radius: 25px;
 }
 
-iframe, #mfccDisplay {
-    border: none;
+#mfccDisplay,
+#predictDisplay {
     width: 100%;
-    color: white;
     margin: 0 auto;
     height: 202px;
     box-sizing: border-box;
     border: 2px solid var(--sub-color);
+}
+
+#predictOutput {
+    display: block;
+    padding: 10px;
 }
 
 input[type="file"] {
@@ -53,19 +61,9 @@ input[type="file"] {
 
 .grid-container {
     display: grid;
-    grid-template-columns: auto 1fr; /* First column auto-sized, second column takes remaining space */
+    grid-template-columns: auto 1fr;
     align-items: center;
     gap: 10px;
-}
-
-#predict {
-    text-align: center;
-    width: 95%;
-}
-
-#reset {
-    background-color: var(--main-color);
-    color: var(--bg-color);
 }
 
 .button {
@@ -80,11 +78,23 @@ input[type="file"] {
     font-weight: 400;
     font-size: 16px;
     outline: none;
-    line-height: 25px;
+    line-height: 20px;
     justify-self: end;
 }
 
-.button:hover, #reset:hover {
+.button:hover,
+#reset:hover {
     background-color: var(--text-color);
+    color: var(--bg-color);
+}
+
+#predict {
+    text-align: center;
+    width: 95%;
+    line-height: 25px;
+}
+
+#reset {
+    background-color: var(--main-color);
     color: var(--bg-color);
 }
