@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    predictDisplay.textContent = data.prediction;
+                    predictDisplay.innerHTML = `<strong>${data.label}</strong><br><br><p style="text-align: justify;">${data.description}</p>`;
                 } else {
                     alert("Error making prediction.");
                 }
@@ -80,6 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("Failed to connect to server.");
             });
     });
+
 
     // Handle Reset
     resetBtn.addEventListener("click", function () {

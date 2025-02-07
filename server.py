@@ -62,15 +62,41 @@ def predict_mfcc(image_path):
     prediction = model.predict(img_array)
     predicted_class = np.argmax(prediction, axis=1)[0]
 
+    # Updated level mapping with descriptions
     level_mapping = {
-        0: "Level 0 (No Significant Depressive Symptoms)",
-        1: "Level 1 (Mild Depressive Symptoms)",
-        2: "Level 2 (Moderate Depressive Symptoms)",
-        3: "Level 3 (Moderately Severe Depressive Symptoms)",
-        4: "Level 4 (Severe Depressive Symptoms)"
+        0: {
+            "label": "Level 0 (No Significant Depressive Symptoms)",
+            "description": "Scores range from 0 to 4, indicating minimal or no depressive symptoms. "
+                        "Individuals in this category generally do not exhibit signs of depression."
+        },
+        1: {
+            "label": "Level 1 (Mild Depressive Symptoms)",
+            "description": "Scores range from 5 to 9, representing mild levels of depression. "
+                        "Symptoms at this level may include slight changes in mood, sleep, and energy, "
+                        "but they typically do not significantly impair daily functioning."
+        },
+        2: {
+            "label": "Level 2 (Moderate Depressive Symptoms)",
+            "description": "Scores range from 10 to 14, indicating moderate depression. "
+                        "Individuals may experience more noticeable symptoms that can start to impact daily "
+                        "activities, like persistent sadness, decreased interest in activities, and changes in appetite or sleep patterns."
+        },
+        3: {
+            "label": "Level 3 (Moderately Severe Depressive Symptoms)",
+            "description": "Scores range from 15 to 19, reflecting a higher intensity of depressive symptoms. "
+                        "This level often includes more pronounced and disruptive symptoms that markedly affect life, "
+                        "such as significant fatigue, feelings of worthlessness, and difficulty concentrating."
+        },
+        4: {
+            "label": "Level 4 (Severe Depressive Symptoms)",
+            "description": "Scores range from 20 to 24, indicating severe depression. "
+                        "This level is characterized by intense, debilitating symptoms that can include extreme sadness, "
+                        "suicidal thoughts, and significant impairment in daily functioning."
+        }
     }
 
-    return level_mapping.get(predicted_class, "Unknown")
+    return level_mapping.get(predicted_class, {"label": "Unknown", "description": "No data available."})
+
 
 # Route to handle file uploads and generate MFCC
 @app.route("/generate_mfcc", methods=["POST"])
@@ -99,7 +125,8 @@ def predict():
         return jsonify({"success": False, "error": "MFCC image not found"}), 400
 
     prediction = predict_mfcc(image_path)
-    return jsonify({"success": True, "prediction": prediction})
+
+    return jsonify({"success": True, "label": prediction["label"], "description": prediction["description"]})
 
 # Run Flask app
 if __name__ == "__main__":
